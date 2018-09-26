@@ -1,4 +1,4 @@
 <launch>
-    <arg name="map" default="$(find racecar)/maps/real-floor4_corridor.yaml"/>
+    <arg name="map" default="$(find racecar)/maps/simple.yaml"/>
     <node pkg="map_server" name="map_server" type="map_server" args="$(arg map)" />
 </launch>
