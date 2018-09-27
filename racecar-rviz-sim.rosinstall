@@ -1,6 +1,6 @@
 - git:
-        local-name: racecar_base
-        uri: https://gitlab.cs.washington.edu/uw_racecar/course_materials/racecar_base
+        local-name: racecar_base_public
+        uri: https://gitlab.cs.washington.edu/uw_racecar/course_materials/racecar_base_public
 
 - git:
         local-name: vesc
