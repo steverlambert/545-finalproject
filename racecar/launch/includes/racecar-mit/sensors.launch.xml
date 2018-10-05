@@ -5,7 +5,7 @@
   <rosparam file="$(arg sensors_config)" command="load" />
 
 
-i  <include file="$(find realsense_camera)/launch/zr300_nodelet_default.launch">
+  <include file="$(find realsense2_camera)/launch/rs_camera.launch">
   </include>
 
   <node pkg="urg_node" type="urg_node" name="laser_node">
