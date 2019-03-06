@@ -12,10 +12,12 @@ Clone this repo into a workspace:
 	cd ~/<ws-name>/src
 	git clone https://gitlab.cs.washington.edu/uw_racecar/course_materials/racecar_base_public
 
-Install ackermann_msgs and map_server:
+Install ackermann_msgs, map_server, numpy, scipy, and networkx:
 	
 	sudo apt-get install ros-kinetic-ackermann-msgs
 	sudo apt-get install ros-kinetic-map-server
+	sudo apt-get install python-numpy python-scipy
+	sudo pip install networkx
 
 Install Cython:
 	
