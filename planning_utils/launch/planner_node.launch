@@ -10,8 +10,9 @@
 
     <param name="pub_topic" type="string" value="planner_node/car_plan" />
 
+</node>
 <!--
     <param name="service_topic" type="string" value="planner_node/get_car_plan" />
-	</node>
+	
 -->
 </launch>
