@@ -1,4 +1,4 @@
 <launch>
-    <arg name="map" default="$(find racecar)/maps/simple.yaml"/>
+    <arg name="map" default="$(find racecar)/maps/small_basement.yaml"/>
     <node pkg="map_server" name="map_server" type="map_server" args="$(arg map)" />
 </launch>

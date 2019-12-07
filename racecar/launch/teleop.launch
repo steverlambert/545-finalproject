@@ -27,5 +27,5 @@
 
   <include file="$(find racecar)/launch/includes/common/car_kinematics.launch" />  
   <include file="$(find racecar)/launch/includes/common/map_server.launch"/>
-  <include file="$(find planning_utils)/launch/planner_node.launch" />
+  <include file="$(find lab3)/launch/PlannerNode.launch" />
 </launch>
